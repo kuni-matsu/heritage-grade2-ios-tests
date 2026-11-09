@@ -44,5 +44,30 @@ final class SyntheticStoreKitTests: XCTestCase {
             }
         }
         XCTAssertTrue(hasAccess, "Non-consumable entitlement should survive a fresh entitlement read")
+        guard hasAccess else { return }
+
+        // A refund must remove the paid entitlement. StoreKit propagates the
+        // revocation asynchronously, so poll within a bounded 10-second window.
+        guard let purchased = session.allTransactions().last(where: { $0.productIdentifier == id }) else {
+            XCTFail("Purchased transaction is missing from the local StoreKit session")
+            return
+        }
+        try session.refundTransaction(identifier: purchased.identifier)
+
+        var accessAfterRefund = true
+        for _ in 0..<50 {
+            accessAfterRefund = false
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let granted) = result,
+                   granted.productID == id,
+                   granted.revocationDate == nil {
+                    accessAfterRefund = true
+                    break
+                }
+            }
+            if !accessAfterRefund { break }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        XCTAssertFalse(accessAfterRefund, "A refunded product must no longer grant paid access")
     }
 }
