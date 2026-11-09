@@ -6,7 +6,8 @@ final class SyntheticStoreKitTests: XCTestCase {
     @MainActor
     func testProductLookupPurchaseAndEntitlement() async throws {
         // Only synthetic StoreKit data is used; the paid question bank is not in this repository.
-        let catalog = try XCTUnwrap(Bundle(for: Self.self).url(forResource: "StoreKitSandbox", withExtension: "storekit"))
+        let catalog = try XCTUnwrap(Bundle.main.url(forResource: "StoreKitSandbox", withExtension: "storekit"))
+        // StoreKit's local test session must use the host application's catalog.
         let session = try SKTestSession(contentsOf: catalog)
         session.disableDialogs = true
         session.clearTransactions()
