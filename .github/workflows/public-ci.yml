@@ -1,0 +1,27 @@
+name: Public runner and safe fixture checks
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate public-only test fixture
+        run: |
+          python3 scripts/check_fixture.py
+  macos-check:
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm Xcode and public fixture
+        run: |
+          xcodebuild -version
+          python3 scripts/check_fixture.py
