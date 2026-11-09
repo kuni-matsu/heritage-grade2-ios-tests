@@ -37,6 +37,8 @@ schemes:
       targets:
         SyntheticHost: all
         SyntheticStoreKitTests: [test]
+    run:
+      storeKitConfiguration: StoreKitSandbox.storekit
     test:
       targets:
         - SyntheticStoreKitTests

@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
-"""Attach the synthetic StoreKit catalog to XcodeGen's generated shared scheme."""
+"""Verify XcodeGen StoreKit scheme path and attach it to XCTest as well."""
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 scheme = Path("Grade2SyntheticHost.xcodeproj/xcshareddata/xcschemes/SyntheticHost.xcscheme")
-assert scheme.exists(), f"Generated shared scheme missing: {scheme}"
+assert scheme.is_file(), f"Shared scheme missing: {scheme}"
 tree = ET.parse(scheme)
 root = tree.getroot()
-for action_name in ("LaunchAction", "TestAction"):
-    action = root.find(action_name)
-    assert action is not None, f"XcodeGen scheme has no {action_name}"
-    for element in list(action):
-        if element.tag == "StoreKitConfigurationFileReference":
-            action.remove(element)
-    ET.SubElement(action, "StoreKitConfigurationFileReference", {
-        "identifier": "container:StoreKitSandbox.storekit"
-    })
+launch = root.find("LaunchAction")
+assert launch is not None, "Generated scheme has no LaunchAction"
+source = launch.find("StoreKitConfigurationFileReference")
+assert source is not None, "XcodeGen did not generate the StoreKit run configuration"
+identifier = source.attrib.get("identifier", "")
+assert identifier == "../../StoreKitSandbox.storekit", (
+    f"Unexpected StoreKit scheme reference: {identifier!r}"
+)
+test = root.find("TestAction")
+assert test is not None, "Generated scheme has no TestAction"
+for element in list(test):
+    if element.tag == "StoreKitConfigurationFileReference":
+        test.remove(element)
+ET.SubElement(test, "StoreKitConfigurationFileReference", {"identifier": identifier})
 tree.write(scheme, encoding="UTF-8", xml_declaration=True)
-assert "container:StoreKitSandbox.storekit" in scheme.read_text()
-print("StoreKit configuration attached to Xcode shared scheme")
+print(f"StoreKit scheme reference active for run and test: {identifier}")
