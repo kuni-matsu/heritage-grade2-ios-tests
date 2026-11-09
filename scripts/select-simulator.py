@@ -14,7 +14,7 @@ def run(*args):
 
 
 def version(value):
-    return tuple(int(s) for s in re.findall(r"\\d+", value))
+    return tuple(int(s) for s in re.findall(r"\d+", value))
 
 
 data = json.loads(run("xcrun", "simctl", "list", "-j").stdout)
