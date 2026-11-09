@@ -17,6 +17,7 @@ jobs:
       - name: Validate public-only test fixture
         run: |
           python3 scripts/check_fixture.py
+          python3 scripts/check-public-storekit.py
   macos-check:
     runs-on: macos-26
     timeout-minutes: 10
@@ -25,4 +26,5 @@ jobs:
       - name: Confirm Xcode and public fixture
         run: |
           xcodebuild -version
+          swift test
           python3 scripts/check_fixture.py
