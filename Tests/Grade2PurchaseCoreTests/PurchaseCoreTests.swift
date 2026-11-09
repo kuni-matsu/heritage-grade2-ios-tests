@@ -19,9 +19,12 @@ final class PurchaseCoreTests: XCTestCase {
         session.disableDialogs = true
         session.clearTransactions()
         let product = try await Grade2PurchaseCore.lookupProduct()
-        XCTAssertNotNil(product, "StoreKit returned no product from the synthetic local catalog")
-        XCTAssertEqual(product?.id, Grade2PurchaseCore.productID)
-        XCTAssertEqual(product?.type, .nonConsumable)
+        guard let product else {
+            XCTFail("StoreKit returned no product from the synthetic local catalog; verify test runner StoreKit configuration")
+            return
+        }
+        XCTAssertEqual(product.id, Grade2PurchaseCore.productID)
+        XCTAssertEqual(product.type, .nonConsumable)
     }
     #endif
 }
