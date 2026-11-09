@@ -7,6 +7,6 @@ let package = Package(
     products: [.library(name: "Grade2PurchaseCore", targets: ["Grade2PurchaseCore"])],
     targets: [
         .target(name: "Grade2PurchaseCore"),
-        .testTarget(name: "Grade2PurchaseCoreTests", dependencies: ["Grade2PurchaseCore"])
+        .testTarget(name: "Grade2PurchaseCoreTests", dependencies: ["Grade2PurchaseCore"], resources: [.copy("StoreKitSandbox.storekit")])
     ]
 )
