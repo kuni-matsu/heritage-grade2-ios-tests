@@ -30,6 +30,8 @@ jobs:
           xcodebuild -list
           xcrun simctl list devices available
           xcodebuild -scheme Grade2StoreKitSandbox -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
-          xcodebuild -scheme Grade2StoreKitSandbox -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO test
+          brew install xcodegen
+          xcodegen generate
+          xcodebuild -project Grade2SyntheticHost.xcodeproj -scheme SyntheticHost -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO test
           python3 scripts/check_fixture.py
           python3 scripts/check-public-storekit.py
