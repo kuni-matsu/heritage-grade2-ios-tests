@@ -69,5 +69,34 @@ final class SyntheticStoreKitTests: XCTestCase {
             try await Task.sleep(nanoseconds: 200_000_000)
         }
         XCTAssertFalse(accessAfterRefund, "A refunded product must no longer grant paid access")
+        guard !accessAfterRefund else { return }
+
+        // Buying the same non-consumable again after a refund should restore
+        // access using a NEW verified transaction, not a revoked purchase.
+        let repurchase = try await product.purchase()
+        guard case .success(let repurchaseResult) = repurchase,
+              case .verified(let newTransaction) = repurchaseResult else {
+            XCTFail("Refunded non-consumable could not be purchased again")
+            return
+        }
+        XCTAssertEqual(newTransaction.productID, id)
+        XCTAssertNil(newTransaction.revocationDate)
+        XCTAssertNotEqual(newTransaction.id, transaction.id,
+                          "Repurchase should create a different transaction")
+        await newTransaction.finish()
+
+        var accessRestored = false
+        for _ in 0..<50 {
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let granted) = result,
+                   granted.productID == id, granted.revocationDate == nil {
+                    accessRestored = true
+                    break
+                }
+            }
+            if accessRestored { break }
+            try await Task.sleep(nanoseconds: 200_000_000)
+        }
+        XCTAssertTrue(accessRestored, "Buying again after a refund must restore paid access")
     }
 }
