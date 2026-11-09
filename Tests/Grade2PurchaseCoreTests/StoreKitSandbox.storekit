@@ -1,0 +1,32 @@
+{
+  "identifier": "A7D53BAE-2F91-46D7-8C9A-149DE892B7E1",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "700",
+      "familyShareable": false,
+      "internalID": "1000001",
+      "localizations": [
+        {
+          "description": "Synthetic test unlock; no real question bank.",
+          "displayName": "Synthetic unlock",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "jp.heritagemaster.grade2.fullaccess",
+      "referenceName": "Synthetic Grade 2 Unlock",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_storefront": "JPN",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}
