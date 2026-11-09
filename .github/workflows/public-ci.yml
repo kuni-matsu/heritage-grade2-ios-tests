@@ -33,6 +33,13 @@ jobs:
           brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
           xcodegen generate
           python3 scripts/attach-storekit-scheme.py
-          xcodebuild -project Grade2SyntheticHost.xcodeproj -scheme SyntheticHost -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 CODE_SIGNING_ALLOWED=NO test
+          xcrun simctl list devices available
+          SIMULATOR_ID="$(python3 scripts/select-simulator.py)"
+          echo "Selected iOS simulator: $SIMULATOR_ID"
+          if ! xcrun simctl list devices booted | grep -Fq "$SIMULATOR_ID"; then
+            xcrun simctl boot "$SIMULATOR_ID"
+          fi
+          xcrun simctl bootstatus "$SIMULATOR_ID" -b
+          xcodebuild -project Grade2SyntheticHost.xcodeproj -scheme SyntheticHost -destination "platform=iOS Simulator,id=$SIMULATOR_ID" -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 CODE_SIGNING_ALLOWED=NO test
           python3 scripts/check_fixture.py
           python3 scripts/check-public-storekit.py
