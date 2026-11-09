@@ -7,14 +7,15 @@ scheme = Path("Grade2SyntheticHost.xcodeproj/xcshareddata/xcschemes/SyntheticHos
 assert scheme.exists(), f"Generated shared scheme missing: {scheme}"
 tree = ET.parse(scheme)
 root = tree.getroot()
-launch = root.find("LaunchAction")
-assert launch is not None, "XcodeGen scheme has no LaunchAction"
-for element in list(launch):
-    if element.tag == "StoreKitConfigurationFileReference":
-        launch.remove(element)
-ET.SubElement(launch, "StoreKitConfigurationFileReference", {
-    "identifier": "container:StoreKitSandbox.storekit"
-})
+for action_name in ("LaunchAction", "TestAction"):
+    action = root.find(action_name)
+    assert action is not None, f"XcodeGen scheme has no {action_name}"
+    for element in list(action):
+        if element.tag == "StoreKitConfigurationFileReference":
+            action.remove(element)
+    ET.SubElement(action, "StoreKitConfigurationFileReference", {
+        "identifier": "container:StoreKitSandbox.storekit"
+    })
 tree.write(scheme, encoding="UTF-8", xml_declaration=True)
 assert "container:StoreKitSandbox.storekit" in scheme.read_text()
 print("StoreKit configuration attached to Xcode shared scheme")
