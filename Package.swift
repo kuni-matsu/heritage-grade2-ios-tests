@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Grade2StoreKitSandbox",
-    platforms: [.iOS(.v16)],
+    platforms: [.iOS(.v16), .macOS(.v12)],
     products: [.library(name: "Grade2PurchaseCore", targets: ["Grade2PurchaseCore"])],
     targets: [
         .target(name: "Grade2PurchaseCore"),
