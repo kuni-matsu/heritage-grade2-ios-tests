@@ -28,6 +28,7 @@ jobs:
           xcodebuild -version
           brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
           xcodegen generate
+          python3 scripts/attach-storekit-scheme.py
           xcodebuild -project Grade2SyntheticHost.xcodeproj -scheme SyntheticHost -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -parallel-testing-enabled NO -maximum-concurrent-test-simulator-destinations 1 CODE_SIGNING_ALLOWED=NO test
           python3 scripts/check_fixture.py
           python3 scripts/check-public-storekit.py
