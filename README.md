@@ -13,7 +13,7 @@ This is a **public, synthetic-only** test repository. It is intentionally separa
 - The full private repository or its Git history
 
 ## Verification scope
-The initial workflows check GitHub-hosted Ubuntu/macOS runner availability and validate the synthetic fixture. **They do not yet compile the actual iPhone app or verify a real StoreKit purchase.** Passing here cannot certify the private iOS build.
+The workflows validate synthetic fixtures on Linux, and build and run a **synthetic iOS test host** on an iPhone simulator on macOS. The iOS test checks local StoreKit non-consumable product lookup (¥700), a verified purchase, and a fresh read of the resulting entitlement. Results must be checked in GitHub Actions; the existence of a test does not imply it has passed. The test does **not** prove App Store sandbox sign-in, the app's actual restore button, or the private 800-question production app build. Passing here cannot certify the private iOS build.
 
 ## Run locally on Windows
 ```powershell
