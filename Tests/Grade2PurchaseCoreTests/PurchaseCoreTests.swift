@@ -11,7 +11,11 @@ final class PurchaseCoreTests: XCTestCase {
     #if os(iOS)
     @MainActor
     func testLocalStoreKitCatalogLoadsOnSimulator() async throws {
-        let session = try SKTestSession(configurationFileNamed: "StoreKitSandbox")
+        guard let catalogURL = Bundle.module.url(forResource: "StoreKitSandbox", withExtension: "storekit") else {
+            XCTFail("Bundled synthetic StoreKit catalog is missing")
+            return
+        }
+        let session = try SKTestSession(contentsOf: catalogURL)
         session.disableDialogs = true
         session.clearTransactions()
         let product = try await Grade2PurchaseCore.lookupProduct()
