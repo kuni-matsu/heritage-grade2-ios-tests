@@ -1,0 +1,40 @@
+name: Grade2SyntheticHost
+options:
+  bundleIdPrefix: jp.heritagemaster.synthetic
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    SWIFT_VERSION: "5.0"
+    CODE_SIGNING_ALLOWED: "NO"
+targets:
+  SyntheticHost:
+    type: application
+    platform: iOS
+    sources:
+      - SyntheticHost
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: jp.heritagemaster.synthetic.host
+  SyntheticStoreKitTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - SyntheticStoreKitTests
+    dependencies:
+      - target: SyntheticHost
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: "YES"
+        PRODUCT_BUNDLE_IDENTIFIER: jp.heritagemaster.synthetic.tests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SyntheticHost.app/SyntheticHost"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  SyntheticHost:
+    build:
+      targets:
+        SyntheticHost: all
+        SyntheticStoreKitTests: [test]
+    test:
+      targets:
+        - SyntheticStoreKitTests
