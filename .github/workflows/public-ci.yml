@@ -28,3 +28,4 @@ jobs:
           xcodebuild -version
           swift test
           python3 scripts/check_fixture.py
+          python3 scripts/check-public-storekit.py
