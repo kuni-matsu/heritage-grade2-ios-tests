@@ -1,0 +1,54 @@
+[
+  {
+    "id": "SYN-1",
+    "category": "制度",
+    "question": "これは公開CI用の架空のテスト問題です。",
+    "choices": [
+      "選択肢A",
+      "選択肢B",
+      "選択肢C",
+      "選択肢D"
+    ],
+    "answer": 0,
+    "synthetic": true
+  },
+  {
+    "id": "SYN-2",
+    "category": "日本",
+    "question": "これは公開CI用の架空のテスト問題です。",
+    "choices": [
+      "選択肢A",
+      "選択肢B",
+      "選択肢C",
+      "選択肢D"
+    ],
+    "answer": 1,
+    "synthetic": true
+  },
+  {
+    "id": "SYN-3",
+    "category": "世界",
+    "question": "これは公開CI用の架空のテスト問題です。",
+    "choices": [
+      "選択肢A",
+      "選択肢B",
+      "選択肢C",
+      "選択肢D"
+    ],
+    "answer": 2,
+    "synthetic": true
+  },
+  {
+    "id": "SYN-4",
+    "category": "時事",
+    "question": "これは公開CI用の架空のテスト問題です。",
+    "choices": [
+      "選択肢A",
+      "選択肢B",
+      "選択肢C",
+      "選択肢D"
+    ],
+    "answer": 3,
+    "synthetic": true
+  }
+]
