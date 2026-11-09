@@ -27,6 +27,7 @@ jobs:
         run: |
           xcodebuild -version
           swift test
-          xcodebuild -scheme Grade2PurchaseCore -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+          xcodebuild -list
+          xcodebuild -scheme Grade2StoreKitSandbox -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
           python3 scripts/check_fixture.py
           python3 scripts/check-public-storekit.py
