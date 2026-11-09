@@ -25,7 +25,8 @@ jobs:
           python3 scripts/test-select-simulator.py
   macos-check:
     # Xcode 26 / iOS 26.5 CLI StoreKit sync is unreliable; use Xcode 16.4 + iOS 18.5.
-    runs-on: macos-15
+    # Try the separate Intel pool while GitHub-hosted Apple Silicon runners are unavailable.
+    runs-on: macos-15-intel
     timeout-minutes: 20
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
