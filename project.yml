@@ -21,6 +21,8 @@ targets:
     platform: iOS
     sources:
       - SyntheticStoreKitTests
+      - path: StoreKitSandbox.storekit
+        buildPhase: resources
     dependencies:
       - target: SyntheticHost
     settings:
