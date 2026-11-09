@@ -1,58 +1,72 @@
 #!/usr/bin/env python3
-"""Select (or create) an available iOS simulator on the GitHub macOS runner.
+"""Use an iOS 18.5 iPhone simulator compatible with Xcode 16.4.
 
+Avoid selecting an iOS 26 simulator when both generations are installed.
 Only a simulator UUID is printed to stdout; diagnostics go to stderr.
 """
 import json
-import re
 import subprocess
 import sys
+
+TARGET_RUNTIME = "com.apple.CoreSimulator.SimRuntime.iOS-18-5"
+PREFERRED_NAMES = ("iPhone 16 Pro", "iPhone 16", "iPhone 16e", "iPhone SE (3rd generation)")
 
 
 def run(*args):
     return subprocess.run(args, capture_output=True, text=True, check=True)
 
 
-def version(value):
-    return tuple(int(s) for s in re.findall(r"\d+", value))
+def choice(data):
+    """Return ('existing', udid, name) or ('create', type_identifier, name)."""
+    runtimes = [
+        r for r in data.get("runtimes", [])
+        if r.get("identifier") == TARGET_RUNTIME and r.get("isAvailable", False)
+    ]
+    if not runtimes:
+        raise ValueError("Xcode 16.4 requires the available iOS 18.5 simulator runtime")
+
+    def rank(name):
+        return PREFERRED_NAMES.index(name) if name in PREFERRED_NAMES else len(PREFERRED_NAMES)
+
+    devices = [
+        d for d in data.get("devices", {}).get(TARGET_RUNTIME, [])
+        if d.get("isAvailable", False)
+        and d.get("udid")
+        and d.get("name", "").startswith("iPhone")
+    ]
+    if devices:
+        devices.sort(key=lambda d: (rank(d["name"]), d.get("state") != "Booted"))
+        selected = devices[0]
+        return ("existing", selected["udid"], selected["name"])
+
+    types = [
+        t for t in data.get("devicetypes", [])
+        if t.get("identifier") and t.get("name", "").startswith("iPhone")
+    ]
+    if not types:
+        raise ValueError("No iPhone simulator device type is installed")
+    types.sort(key=lambda t: rank(t["name"]))
+    selected = types[0]
+    return ("create", selected["identifier"], selected["name"])
 
 
-data = json.loads(run("xcrun", "simctl", "list", "-j").stdout)
-devices = []
-for runtime_id, entries in data.get("devices", {}).items():
-    if ".SimRuntime.iOS-" not in runtime_id:
-        continue
-    for d in entries:
-        if d.get("isAvailable", False) and "iPhone" in d.get("name", ""):
-            devices.append(d)
-if devices:
-    devices.sort(key=lambda d: (d.get("name") == "iPhone 17 Pro", d.get("state") == "Booted"), reverse=True)
-    print(f"Found available device: {devices[0]['name']}", file=sys.stderr)
-    print(devices[0]["udid"])
-    sys.exit(0)
+def main():
+    data = json.loads(run("xcrun", "simctl", "list", "-j").stdout)
+    try:
+        action, identifier, name = choice(data)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        print("Installed runtimes:", data.get("runtimes", []), file=sys.stderr)
+        sys.exit(2)
+    if action == "existing":
+        print(f"Selected iOS 18.5 device: {name}", file=sys.stderr)
+        print(identifier)
+    else:
+        print(f"Creating iOS 18.5 device: {name}", file=sys.stderr)
+        created = run("xcrun", "simctl", "create", "SyntheticGrade2CI",
+                      identifier, TARGET_RUNTIME)
+        print(created.stdout.strip())
 
-runtimes = [
-    r for r in data.get("runtimes", [])
-    if r.get("isAvailable", False)
-    and (r.get("identifier", "").startswith("com.apple.CoreSimulator.SimRuntime.iOS-"))
-]
-if not runtimes:
-    print("No available iOS simulator devices or runtimes on this macOS runner.", file=sys.stderr)
-    print("Available runtime data:", data.get("runtimes", []), file=sys.stderr)
-    sys.exit(2)
-runtime = max(runtimes, key=lambda r: version(r.get("identifier", "")))
-types = [
-    t for t in data.get("devicetypes", [])
-    if "iPhone" in t.get("name", "") and t.get("identifier")
-]
-if not types:
-    print("No iPhone simulator device types installed.", file=sys.stderr)
-    sys.exit(3)
-types.sort(key=lambda t: (t.get("name") == "iPhone 17 Pro", t.get("name") == "iPhone 17"), reverse=True)
-device_type = types[0]
-print(f"Creating {device_type['name']} with {runtime['identifier']}", file=sys.stderr)
-created = run(
-    "xcrun", "simctl", "create", "SyntheticGrade2CI",
-    device_type["identifier"], runtime["identifier"]
-)
-print(created.stdout.strip())
+
+if __name__ == "__main__":
+    main()

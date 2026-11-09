@@ -22,6 +22,7 @@ jobs:
         run: |
           python3 scripts/check_fixture.py
           python3 scripts/check-public-storekit.py
+          python3 scripts/test-select-simulator.py
   macos-check:
     # Xcode 26 / iOS 26.5 CLI StoreKit sync is unreliable; use Xcode 16.4 + iOS 18.5.
     runs-on: macos-15
